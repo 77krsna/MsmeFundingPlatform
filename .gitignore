@@ -8,4 +8,10 @@ oracle/venv/
 .env.*
 !.env.example
 
+blockchain/artifacts/
+blockchain/cache/
+
 .DS_Store
+package.json.broken
+package-lock 2.json
+oracle/requirements.txt.bak
