@@ -15,3 +15,7 @@ blockchain/cache/
 package.json.broken
 package-lock 2.json
 oracle/requirements.txt.bak
+
+# runtime
+logs/
+.pids/
