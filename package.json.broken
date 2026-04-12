@@ -1,0 +1,50 @@
+{
+  "name": "msme-finance-platform",
+  "version": "1.0.0",
+  "description": "Blockchain-based MSME financing platform",
+  "private": true,
+  "workspaces": [
+    "blockchain",
+    "frontend",
+    "oracle"
+  ],
+  "scripts": {
+    "setup": "npm install && cd blockchain && npm install && cd ../frontend && npm install",
+    "dev:blockchain": "cd blockchain && npm run node",
+    "dev:oracle": "cd oracle && python3 -m uvicorn app.main:app --reload",
+    "dev:frontend": "cd frontend && npm run dev",
+    "test:blockchain": "cd blockchain && npm test",
+    "test:oracle": "cd oracle && pytest",
+    "deploy:testnet": "cd blockchain && npm run deploy:mumbai"
+  },
+  "author": "krishna",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}
+{
+  "name": "msme-finance-platform",
+  "version": "1.0.0",
+  "description": "Blockchain-based MSME financing platform",
+  "private": true,
+  "workspaces": [
+    "blockchain",
+    "frontend",
+    "oracle"
+  ],
+  "scripts": {
+    "setup": "npm install && cd blockchain && npm install && cd ../frontend && npm install",
+    "dev:blockchain": "cd blockchain && npm run node",
+    "dev:oracle": "cd oracle && python3 -m uvicorn app.main:app --reload",
+    "dev:oracle": "cd oracle && python3 -m uvicorn app.main:app --reload"
+    "test:blockchain": "cd blockchain && npm test",
+    "test:oracle": "cd oracle && pytest",
+    "deploy:testnet": "cd blockchain && npm run deploy:mumbai"
+  },
+  "author": "krishna",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}

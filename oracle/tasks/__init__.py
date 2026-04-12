@@ -1,0 +1,8 @@
+# oracle/tasks/__init__.py
+"""
+Celery tasks package
+"""
+
+from tasks.celery_app import celery_app
+
+__all__ = ['celery_app']

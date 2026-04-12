@@ -1,0 +1,553 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "FundingApproved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "FundingRejected",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "msmeId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "FundingRequested",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "msmeOwner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "FundsDisbursed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "investor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "InvestmentMade",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RepaymentMade",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum FundingRequest.FundingStatus",
+        "name": "newStatus",
+        "type": "uint8"
+      }
+    ],
+    "name": "StatusChanged",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "admin",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_requestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "approveFundingRequest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_msmeId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amountRequired",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_interestRate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tenure",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_purpose",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_documentHash",
+        "type": "string"
+      }
+    ],
+    "name": "createFundingRequest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_requestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "disburseFunds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "fundRequests",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "msmeId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "msmeOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountRequired",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountFunded",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "interestRate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tenure",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "purpose",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "documentHash",
+        "type": "string"
+      },
+      {
+        "internalType": "enum FundingRequest.FundingStatus",
+        "name": "status",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "createdAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fundedAt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFundRequest",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "msmeId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "msmeOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountRequired",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountFunded",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "interestRate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tenure",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "purpose",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "documentHash",
+            "type": "string"
+          },
+          {
+            "internalType": "enum FundingRequest.FundingStatus",
+            "name": "status",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fundedAt",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct FundingRequest.FundRequest",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_requestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getInvestments",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "investor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isRepaid",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct FundingRequest.Investment[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_investor",
+        "type": "address"
+      }
+    ],
+    "name": "getInvestorPortfolio",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_requestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "invest",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "investorPortfolio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_requestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "makeRepayment",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_requestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "rejectFundingRequest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "requestCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "requestInvestments",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "investor",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isRepaid",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

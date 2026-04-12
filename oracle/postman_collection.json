@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "MSME Finance Platform API",
+    "description": "Complete API collection for MSME Finance Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & Status",
+      "item": [
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "System Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/orders/?page=1&page_size=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "orders", ""],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "page_size", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/orders/stats/summary",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "orders", "stats", "summary"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "MSME",
+      "item": [
+        {
+          "name": "Register MSME",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wallet_address\": \"0x1111111111111111111111111111111111111111\",\n  \"company_name\": \"Test Company\",\n  \"gstn\": \"27AABCU9603R1ZM\",\n  \"pan\": \"ABCDE1234F\",\n  \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/msme/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "msme", "register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Investors",
+      "item": [
+        {
+          "name": "Investment Opportunities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/investors/opportunities",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "investors", "opportunities"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Trigger Scrape",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/admin/trigger-scrape",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "admin", "trigger-scrape"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
