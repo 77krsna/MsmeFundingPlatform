@@ -1,177 +1,221 @@
-// src/pages/MSMEPage.jsx
-import { useState } from 'react';
-import { registerMSME, getMSMEByWallet } from '../lib/api';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const API = import.meta.env.VITE_API_URL;
 
 export default function MSMEPage() {
-  const [formData, setFormData] = useState({
-    wallet_address: '',
-    company_name: '',
-    gstn: '',
-    pan: '',
-    email: '',
-  });
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [gstnNumber, setGstnNumber] = useState("");
+  const [panNumber, setPanNumber] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [list, setList] = useState([]);
+  const [loadingList, setLoadingList] = useState(true);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  const loadList = async () => {
+    setLoadingList(true);
     setError(null);
     try {
-      const data = await registerMSME(formData);
-      setResult(data);
-    } catch (err) {
-      setError(err.response?.data?.detail || err.message);
+      const res = await fetch(`${API}/api/msme/list`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Failed to load MSME list");
+
+      const items = Array.isArray(data) ? data : (data.items || []);
+      setList(items);
+    } catch (e) {
+      setError(String(e.message || e));
     } finally {
-      setLoading(false);
+      setLoadingList(false);
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    loadList();
+  }, []);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const payload = {
+        wallet_address: walletAddress,
+        company_name: companyName,
+        gstn_number: gstnNumber,
+        pan_number: panNumber,
+        email: email,
+      };
+
+      const res = await fetch(`${API}/api/msme/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || data.message || "MSME registration failed");
+
+      setSuccess(`MSME registered successfully (id: ${data.msme_id || "created"})`);
+
+      setWalletAddress("");
+      setCompanyName("");
+      setGstnNumber("");
+      setPanNumber("");
+      setEmail("");
+
+      await loadList();
+
+      // Optional: go to dashboard after a moment
+      setTimeout(() => navigate("/dashboard"), 800);
+    } catch (e) {
+      setError(String(e.message || e));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">MSME Registration</h1>
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold">MSME Registration</h1>
+        <p className="text-gray-600">Register your company and view registered MSMEs.</p>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Registration Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-4">Register Your Company</h2>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Wallet Address
-              </label>
-              <input
-                type="text"
-                name="wallet_address"
-                value={formData.wallet_address}
-                onChange={handleChange}
-                placeholder="0x..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Company Name
-              </label>
-              <input
-                type="text"
-                name="company_name"
-                value={formData.company_name}
-                onChange={handleChange}
-                placeholder="Enter company name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                GSTN Number
-              </label>
-              <input
-                type="text"
-                name="gstn"
-                value={formData.gstn}
-                onChange={handleChange}
-                placeholder="22AAAAA0000A1Z5"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                PAN Number
-              </label>
-              <input
-                type="text"
-                name="pan"
-                value={formData.pan}
-                onChange={handleChange}
-                placeholder="ABCDE1234F"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="company@example.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              {loading ? 'Registering...' : 'Register MSME'}
-            </button>
-          </form>
-
-          {error && (
-            <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
-              {error}
-            </div>
-          )}
-
-          {result && (
-            <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 text-green-700 text-sm">
-              ✅ MSME registered successfully!
-              <br />ID: {result.id}
-              <br />Company: {result.company_name}
-            </div>
-          )}
+      {error && (
+        <div className="p-3 rounded border border-red-300 bg-red-50 text-red-700">
+          {error}
         </div>
+      )}
 
-        {/* Info Panel */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-4">How It Works</h2>
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">1️⃣</span>
-              <div>
-                <p className="font-medium">Register your MSME</p>
-                <p className="text-sm text-gray-500">Provide company details and GSTN</p>
-              </div>
+      {success && (
+        <div className="p-3 rounded border border-green-300 bg-green-50 text-green-700">
+          {success}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <form onSubmit={submit} className="bg-white border rounded-lg p-4 space-y-3">
+          <div className="font-semibold mb-1">Register Your Company</div>
+
+          <div>
+            <label className="block text-sm font-medium">Wallet Address</label>
+            <input
+              className="mt-1 w-full border rounded px-3 py-2"
+              placeholder="0x..."
+              value={walletAddress}
+              onChange={(e) => setWalletAddress(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Company Name</label>
+            <input
+              className="mt-1 w-full border rounded px-3 py-2"
+              placeholder="Enter company name"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">GSTN Number</label>
+            <input
+              className="mt-1 w-full border rounded px-3 py-2"
+              placeholder="22AAAAA0000A1Z5"
+              value={gstnNumber}
+              onChange={(e) => setGstnNumber(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">PAN Number</label>
+            <input
+              className="mt-1 w-full border rounded px-3 py-2"
+              placeholder="ABCDE1234F"
+              value={panNumber}
+              onChange={(e) => setPanNumber(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Email</label>
+            <input
+              className="mt-1 w-full border rounded px-3 py-2"
+              placeholder="company@example.com"
+              value={email}
+              type="email"
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <button
+            disabled={submitting}
+            className="w-full mt-2 px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+          >
+            {submitting ? "Registering..." : "Register MSME"}
+          </button>
+        </form>
+
+        <div className="bg-white border rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="font-semibold">Registered MSMEs</div>
+            <button
+              onClick={loadList}
+              className="px-3 py-1.5 rounded bg-gray-800 text-white"
+            >
+              Refresh
+            </button>
+          </div>
+
+          {loadingList ? (
+            <div className="text-gray-600">Loading list...</div>
+          ) : list.length === 0 ? (
+            <div className="text-gray-600">No MSMEs found. Register one to see it here.</div>
+          ) : (
+            <div className="overflow-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-left border-b">
+                    <th className="py-2 pr-3">Company</th>
+                    <th className="py-2 pr-3">Wallet</th>
+                    <th className="py-2 pr-3">GSTN</th>
+                    <th className="py-2 pr-3">Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {list.map((m) => (
+                    <tr key={m.id || m.wallet_address} className="border-b">
+                      <td className="py-2 pr-3">{m.company_name || "N/A"}</td>
+                      <td className="py-2 pr-3">
+                        <span className="font-mono text-xs">
+                          {m.wallet_address ? `${m.wallet_address.slice(0, 6)}...${m.wallet_address.slice(-4)}` : "N/A"}
+                        </span>
+                      </td>
+                      <td className="py-2 pr-3">{m.gstn_number || "N/A"}</td>
+                      <td className="py-2 pr-3">{m.email || "N/A"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">2️⃣</span>
-              <div>
-                <p className="font-medium">Win GeM orders</p>
-                <p className="text-sm text-gray-500">Oracle auto-detects your government orders</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">3️⃣</span>
-              <div>
-                <p className="font-medium">Get funded</p>
-                <p className="text-sm text-gray-500">Investors fund your orders in tranches</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">4️⃣</span>
-              <div>
-                <p className="font-medium">Deliver & get paid</p>
-                <p className="text-sm text-gray-500">Complete delivery, government pays, investors earn</p>
-              </div>
-            </div>
+          )}
+
+          <div className="text-xs text-gray-500 mt-3">
+            Data source: <code>GET /api/msme/list</code>
           </div>
         </div>
       </div>

@@ -117,6 +117,29 @@ async def get_msme_by_wallet(wallet_address: str, db: Session = Depends(get_db))
         "gstn": msme.gstn,
         "reputation_score": msme.reputation_score
     }
+from sqlalchemy import text
+
+@router.get("/list")
+def list_msmes(db: Session = Depends(get_db)):
+    rows = db.execute(text("""
+      SELECT id, company_name, gstn, pan, created_at
+      FROM msmes
+      ORDER BY created_at DESC
+      LIMIT 100
+    """)).fetchall()
+
+    return {
+        "items": [
+            {
+                "id": str(r[0]),
+                "company_name": r[1],
+                "gstn_number": r[2],
+                "pan_number": r[3],
+                "created_at": r[4].isoformat() if r[4] else None,
+            }
+            for r in rows
+        ]
+    }
 @router.get("/{msme_id}")
 async def get_msme(msme_id: str, db: Session = Depends(get_db)):
     """Get MSME by ID"""
@@ -131,3 +154,33 @@ async def get_msme(msme_id: str, db: Session = Depends(get_db)):
         "gstn": msme.gstn,
         "reputation_score": msme.reputation_score
     }
+from sqlalchemy import text
+
+@router.get("/list")
+def list_msmes(db: Session = Depends(get_db)):
+    cols = {r[0] for r in db.execute(text("""
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name='msmes'
+    """)).fetchall()}
+
+    wanted = ["id","wallet_address","company_name","gstn_number","pan_number","email","created_at"]
+    select_cols = [c for c in wanted if c in cols]
+    if not select_cols:
+        return {"items": []}
+
+    order_col = "created_at" if "created_at" in cols else "id"
+    q = f"SELECT {', '.join(select_cols)} FROM msmes ORDER BY {order_col} DESC LIMIT 100"
+    rows = db.execute(text(q)).fetchall()
+
+    items = []
+    for row in rows:
+        obj = {}
+        for i, c in enumerate(select_cols):
+            v = row[i]
+            if hasattr(v, "isoformat"):
+                v = v.isoformat()
+            else:
+                v = str(v) if c == "id" else v
+            obj[c] = v
+        items.append(obj)
+    return {"items": items}

@@ -1,65 +1,87 @@
-// src/pages/InvestorsPage.jsx
-import { useEffect, useState } from 'react';
-import { getOpportunities } from '../lib/api';
-import StatusBadge from '../components/common/StatusBadge';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import { useEffect, useState } from "react";
+
+const API = import.meta.env.VITE_API_URL;
 
 export default function InvestorsPage() {
-  const [opportunities, setOpportunities] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState([]);
+  const [busyId, setBusyId] = useState(null);
+  const [error, setError] = useState(null);
+
+  const load = async () => {
+    setError(null);
+    const res = await fetch(`${API}/api/investors/opportunities`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || data.error || "Failed to load opportunities");
+    setItems(Array.isArray(data) ? data : (data.items || []));
+  };
+
+  const investNow = async (o) => {
+    setBusyId(o.order_id);
+    setError(null);
+    try {
+      const res = await fetch(`${API}/api/investors/invest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: o.order_id, eth_wei: 1 }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || data.error || `Invest failed (${res.status})`);
+
+      alert(`Invest success!\nTX: ${data.tx_hash}\nStatus: ${data.new_status}`);
+      await load();
+    } catch (e) {
+      setError(String(e.message || e));
+    } finally {
+      setBusyId(null);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getOpportunities();
-        setOpportunities(data || []);
-      } catch (err) {
-        console.error('Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    load().catch((e) => setError(String(e.message || e)));
   }, []);
 
-  if (loading) return <LoadingSpinner message="Loading opportunities..." />;
-
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Investment Opportunities</h1>
-      <p className="text-gray-500">Fund MSME government orders and earn returns</p>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Investment Opportunities</h1>
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          onClick={() => load().catch((e) => setError(String(e)))}
+        >
+          Refresh
+        </button>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {opportunities.map((opp) => (
-          <div key={opp.order_id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start mb-3">
-              <h3 className="font-semibold text-lg">{opp.gem_order_id}</h3>
-              <StatusBadge status={opp.status} />
+      {error && (
+        <div className="mb-4 p-3 border border-red-300 bg-red-50 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {items.map((o) => {
+          const isFunded = ["FUNDED", "REPAID", "DEFAULTED"].includes(o.status);
+          return (
+            <div key={o.order_id} className="border rounded p-4 bg-white">
+              <div className="font-semibold">{o.gem_order_id}</div>
+              <div className="text-2xl font-bold mt-1">
+                ₹{Number(o.order_amount || 0).toLocaleString("en-IN")}
+              </div>
+              <div className="text-sm text-gray-600 mt-2">Status: {o.status}</div>
+              <div className="text-sm text-gray-600">Risk: {o.risk_score}/10</div>
+              <div className="text-sm text-gray-600">Est Return: {o.estimated_return}%</div>
+
+              <button
+                className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+                disabled={isFunded || busyId === o.order_id}
+                onClick={() => investNow(o)}
+              >
+                {isFunded ? "Already Funded" : busyId === o.order_id ? "Investing..." : "Invest Now"}
+              </button>
             </div>
-            
-            <p className="text-2xl font-bold text-green-600 mb-2">
-              ₹{Number(opp.order_amount).toLocaleString('en-IN')}
-            </p>
-            
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>🏢 {opp.buyer_organization}</p>
-              <p>📦 {opp.product_category}</p>
-              <p>📅 Deadline: {new Date(opp.delivery_deadline).toLocaleDateString('en-IN')}</p>
-              <p>📈 Est. Return: <span className="text-green-600 font-semibold">{opp.estimated_return}%</span></p>
-              <p>⚠️ Risk Score: {opp.risk_score}/10</p>
-            </div>
-
-            <button className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
-              Invest Now
-            </button>
-          </div>
-        ))}
-
-        {opportunities.length === 0 && (
-          <div className="col-span-3 text-center py-12 text-gray-500">
-            No investment opportunities available right now.
-          </div>
-        )}
+          );
+        })}
       </div>
     </div>
   );
